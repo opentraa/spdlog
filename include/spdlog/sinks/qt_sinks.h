@@ -33,7 +33,7 @@ public:
         : qt_object_(qt_object),
           meta_method_(std::move(meta_method)) {
         if (!qt_object_) {
-            throw_spdlog_ex("qt_sink: qt_object is null");
+            SPDLOG_THROW(spdlog_ex("qt_sink: qt_object is null"));
         }
     }
 
@@ -73,7 +73,7 @@ public:
           max_lines_(max_lines),
           is_utf8_(is_utf8) {
         if (!qt_text_edit_) {
-            throw_spdlog_ex("qt_color_text_sink: text_edit is null");
+            SPDLOG_THROW(spdlog_ex("qt_color_text_sink: text_edit is null"));
         }
 
         default_color_ = qt_text_edit_->currentCharFormat();

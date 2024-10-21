@@ -62,7 +62,7 @@ protected:
         }
 
         if (ret < 0) {
-            throw_spdlog_ex("logging to Android failed", ret);
+            SPDLOG_THROW(spdlog_ex("logging to Android failed", ret));
         }
     }
 

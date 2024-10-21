@@ -46,26 +46,26 @@ public:
             RdKafka::Conf::ConfResult confRes =
                 conf_->set("bootstrap.servers", config_.server_addr, errstr);
             if (confRes != RdKafka::Conf::CONF_OK) {
-                throw_spdlog_ex(
-                    fmt_lib::format("conf set bootstrap.servers failed err:{}", errstr));
+                SPDLOG_THROW(
+                    spdlog_ex(fmt_lib::format("conf set bootstrap.servers failed err:{}", errstr)));
             }
 
             tconf_.reset(RdKafka::Conf::create(RdKafka::Conf::CONF_TOPIC));
             if (tconf_ == nullptr) {
-                throw_spdlog_ex(fmt_lib::format("create topic config failed"));
+                SPDLOG_THROW(spdlog_ex(fmt_lib::format("create topic config failed")));
             }
 
             producer_.reset(RdKafka::Producer::create(conf_.get(), errstr));
             if (producer_ == nullptr) {
-                throw_spdlog_ex(fmt_lib::format("create producer failed err:{}", errstr));
+                SPDLOG_THROW(spdlog_ex(fmt_lib::format("create producer failed err:{}", errstr)));
             }
             topic_.reset(RdKafka::Topic::create(producer_.get(), config_.produce_topic,
                                                 tconf_.get(), errstr));
             if (topic_ == nullptr) {
-                throw_spdlog_ex(fmt_lib::format("create topic failed err:{}", errstr));
+                SPDLOG_THROW(spdlog_ex(fmt_lib::format("create topic failed err:{}", errstr)));
             }
         } catch (const std::exception &e) {
-            throw_spdlog_ex(fmt_lib::format("error create kafka instance: {}", e.what()));
+            SPDLOG_THROW(spdlog_ex(fmt_lib::format("error create kafka instance: {}", e.what())));
         }
     }
 

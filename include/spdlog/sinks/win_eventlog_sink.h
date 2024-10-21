@@ -99,7 +99,7 @@ public:
     /** creates a wrapped SID copy */
     static sid_t duplicate_sid(PSID psid) {
         if (!::IsValidSid(psid)) {
-            throw_spdlog_ex("sid_t::sid_t(): invalid SID received");
+            SPDLOG_THROW_X(spdlog_ex("sid_t::sid_t(): invalid SID received"), sid_t);
         }
 
         auto const sid_length{::GetLengthSid(psid)};
@@ -107,7 +107,7 @@ public:
         sid_t result;
         result.buffer_.resize(sid_length);
         if (!::CopySid(sid_length, (PSID)result.as_sid(), psid)) {
-            SPDLOG_THROW(win32_error("CopySid"));
+            SPDLOG_THROW_X(win32_error("CopySid"), sid_t);
         }
 
         return result;
@@ -123,7 +123,7 @@ public:
             HANDLE token_handle_ = INVALID_HANDLE_VALUE;
             explicit process_token_t(HANDLE process) {
                 if (!::OpenProcessToken(process, TOKEN_QUERY, &token_handle_)) {
-                    SPDLOG_THROW(win32_error("OpenProcessToken"));
+                    SPDLOG_THROW_X(win32_error("OpenProcessToken"), sid_t);
                 }
             }
 
@@ -137,14 +137,14 @@ public:
         DWORD tusize = 0;
         if (::GetTokenInformation(current_process_token.token_handle_, TokenUser, NULL, 0,
                                   &tusize)) {
-            SPDLOG_THROW(win32_error("GetTokenInformation should fail"));
+            SPDLOG_THROW_X(win32_error("GetTokenInformation should fail"), sid_t);
         }
 
         // get user token
         std::vector<unsigned char> buffer(static_cast<size_t>(tusize));
         if (!::GetTokenInformation(current_process_token.token_handle_, TokenUser,
                                    (LPVOID)buffer.data(), tusize, &tusize)) {
-            SPDLOG_THROW(win32_error("GetTokenInformation"));
+            SPDLOG_THROW_X(win32_error("GetTokenInformation"), sid_t);
         }
 
         // create a wrapper of the SID data as stored in the user token
@@ -195,7 +195,7 @@ private:
         if (!hEventLog_) {
             hEventLog_ = ::RegisterEventSourceA(nullptr, source_.c_str());
             if (!hEventLog_ || hEventLog_ == (HANDLE)ERROR_ACCESS_DENIED) {
-                SPDLOG_THROW(internal::win32_error("RegisterEventSource"));
+                SPDLOG_THROW_X(internal::win32_error("RegisterEventSource"), nullptr);
             }
         }
 

@@ -53,7 +53,7 @@ public:
         struct addrinfo *addrinfo_result;
         auto rv = ::getaddrinfo(host.c_str(), port_str.c_str(), &hints, &addrinfo_result);
         if (rv != 0) {
-            throw_spdlog_ex(fmt_lib::format("::getaddrinfo failed: {}", gai_strerror(rv)));
+            SPDLOG_THROW(spdlog_ex(fmt_lib::format("::getaddrinfo failed: {}", gai_strerror(rv))));
         }
 
         // Try each address until we successfully connect(2).
@@ -79,7 +79,7 @@ public:
         }
         ::freeaddrinfo(addrinfo_result);
         if (socket_ == -1) {
-            throw_spdlog_ex("::connect failed", last_errno);
+            SPDLOG_THROW(spdlog_ex("::connect failed", last_errno));
         }
 
         // set TCP_NODELAY
@@ -112,7 +112,7 @@ public:
                 ::send(socket_, data + bytes_sent, n_bytes - bytes_sent, send_flags);
             if (write_result < 0) {
                 close();
-                throw_spdlog_ex("write(2) failed", errno);
+                SPDLOG_THROW(spdlog_ex("write(2) failed", errno));
             }
 
             if (write_result == 0)  // (probably should not happen but in any case..)

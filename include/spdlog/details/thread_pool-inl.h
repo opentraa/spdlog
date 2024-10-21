@@ -19,9 +19,9 @@ SPDLOG_INLINE thread_pool::thread_pool(size_t q_max_items,
                                        std::function<void()> on_thread_stop)
     : q_(q_max_items) {
     if (threads_n == 0 || threads_n > 1000) {
-        throw_spdlog_ex(
+        SPDLOG_THROW(spdlog_ex(
             "spdlog::thread_pool(): invalid threads_n param (valid "
-            "range is 1-1000)");
+            "range is 1-1000)"));
     }
     for (size_t i = 0; i < threads_n; i++) {
         threads_.emplace_back([this, on_thread_start, on_thread_stop] {

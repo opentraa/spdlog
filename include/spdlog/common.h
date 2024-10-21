@@ -109,12 +109,24 @@
     #define SPDLOG_THROW(ex)                               \
         do {                                               \
             printf("spdlog fatal error: %s\n", ex.what()); \
-            std::abort();                                  \
+            return;                                        \
+        } while (0)
+    #define SPDLOG_THROW_0(ex)                             \
+        do {                                               \
+            printf("spdlog fatal error: %s\n", ex.what()); \
+            return 0;                                      \
+        } while (0)
+    #define SPDLOG_THROW_X(ex, x)                          \
+        do {                                               \
+            printf("spdlog fatal error: %s\n", ex.what()); \
+            return x;                                      \
         } while (0)
     #define SPDLOG_CATCH_STD
 #else
     #define SPDLOG_TRY try
     #define SPDLOG_THROW(ex) throw(ex)
+    #define SPDLOG_THROW_0(ex) throw(ex)
+    #define SPDLOG_THROW_X(ex, x) throw(ex)
     #define SPDLOG_CATCH_STD             \
         catch (const std::exception &) { \
         }
@@ -308,9 +320,6 @@ public:
 private:
     std::string msg_;
 };
-
-[[noreturn]] SPDLOG_API void throw_spdlog_ex(const std::string &msg, int last_errno);
-[[noreturn]] SPDLOG_API void throw_spdlog_ex(std::string msg);
 
 struct source_loc {
     SPDLOG_CONSTEXPR source_loc() = default;

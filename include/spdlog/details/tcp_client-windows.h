@@ -38,7 +38,7 @@ class tcp_client {
                          last_error, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), buf,
                          (sizeof(buf) / sizeof(char)), NULL);
 
-        throw_spdlog_ex(fmt_lib::format("tcp_sink - {}: {}", msg, buf));
+        SPDLOG_THROW(spdlog_ex(fmt_lib::format("tcp_sink - {}: {}", msg, buf)));
     }
 
 public:

@@ -34,7 +34,7 @@ inline void append_int(T n, memory_buf_t &dest) {
     if (ec == std::errc()) {
         dest.append(buf, ptr);
     } else {
-        throw_spdlog_ex("Failed to format int", static_cast<int>(ec));
+        SPDLOG_THROW(spdlog_ex("Failed to format int", static_cast<int>(ec)));
     }
 }
 #else

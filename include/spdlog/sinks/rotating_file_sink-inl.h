@@ -35,11 +35,11 @@ SPDLOG_INLINE rotating_file_sink<Mutex>::rotating_file_sink(
       max_files_(max_files),
       file_helper_{event_handlers} {
     if (max_size == 0) {
-        throw_spdlog_ex("rotating sink constructor: max_size arg cannot be zero");
+        SPDLOG_THROW(spdlog_ex("rotating sink constructor: max_size arg cannot be zero"));
     }
 
     if (max_files > 200000) {
-        throw_spdlog_ex("rotating sink constructor: max_files arg cannot exceed 200000");
+        SPDLOG_THROW(spdlog_ex("rotating sink constructor: max_files arg cannot exceed 200000"));
     }
     file_helper_.open(calc_filename(base_filename_, 0));
     current_size_ = file_helper_.size();  // expensive. called only once
@@ -121,9 +121,9 @@ SPDLOG_INLINE void rotating_file_sink<Mutex>::rotate_() {
                 file_helper_.reopen(
                     true);  // truncate the log file anyway to prevent it to grow beyond its limit!
                 current_size_ = 0;
-                throw_spdlog_ex("rotating_file_sink: failed renaming " + filename_to_str(src) +
+                SPDLOG_THROW(spdlog_ex("rotating_file_sink: failed renaming " + filename_to_str(src) +
                                     " to " + filename_to_str(target),
-                                errno);
+                                errno));
             }
         }
     }

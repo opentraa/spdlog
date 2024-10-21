@@ -198,7 +198,7 @@ SPDLOG_INLINE bool path_exists(const filename_t &filename) SPDLOG_NOEXCEPT {
 // Return file size according to open FILE* object
 SPDLOG_INLINE size_t filesize(FILE *f) {
     if (f == nullptr) {
-        throw_spdlog_ex("Failed getting file size. fd is null");
+        SPDLOG_THROW_0(spdlog_ex("Failed getting file size. fd is null"));
     }
 #if defined(_WIN32) && !defined(__CYGWIN__)
     int fd = ::_fileno(f);
@@ -236,7 +236,7 @@ SPDLOG_INLINE size_t filesize(FILE *f) {
     }
     #endif
 #endif
-    throw_spdlog_ex("Failed getting file size from fd", errno);
+    SPDLOG_THROW_0(spdlog_ex("Failed getting file size from fd", errno));
     return 0;  // will not be reached.
 }
 
@@ -254,7 +254,8 @@ SPDLOG_INLINE int utc_minutes_offset(const std::tm &tm) {
     DYNAMIC_TIME_ZONE_INFORMATION tzinfo;
     auto rv = ::GetDynamicTimeZoneInformation(&tzinfo);
     #endif
-    if (rv == TIME_ZONE_ID_INVALID) throw_spdlog_ex("Failed getting timezone info. ", errno);
+    if (rv == TIME_ZONE_ID_INVALID)
+        SPDLOG_THROW_0(spdlog_ex("Failed getting timezone info. ", errno));
 
     int offset = -tzinfo.Bias;
     if (tm.tm_isdst) {
@@ -440,7 +441,7 @@ SPDLOG_INLINE bool in_terminal(FILE *file) SPDLOG_NOEXCEPT {
 #if (defined(SPDLOG_WCHAR_TO_UTF8_SUPPORT) || defined(SPDLOG_WCHAR_FILENAMES)) && defined(_WIN32)
 SPDLOG_INLINE void wstr_to_utf8buf(wstring_view_t wstr, memory_buf_t &target) {
     if (wstr.size() > static_cast<size_t>((std::numeric_limits<int>::max)()) / 4 - 1) {
-        throw_spdlog_ex("UTF-16 string is too big to be converted to UTF-8");
+        SPDLOG_THROW(spdlog_ex("UTF-16 string is too big to be converted to UTF-8"));
     }
 
     int wstr_size = static_cast<int>(wstr.size());
@@ -466,13 +467,13 @@ SPDLOG_INLINE void wstr_to_utf8buf(wstring_view_t wstr, memory_buf_t &target) {
         }
     }
 
-    throw_spdlog_ex(
-        fmt_lib::format("WideCharToMultiByte failed. Last error: {}", ::GetLastError()));
+    SPDLOG_THROW(spdlog_ex(
+        fmt_lib::format("WideCharToMultiByte failed. Last error: {}", ::GetLastError())));
 }
 
 SPDLOG_INLINE void utf8_to_wstrbuf(string_view_t str, wmemory_buf_t &target) {
     if (str.size() > static_cast<size_t>((std::numeric_limits<int>::max)()) - 1) {
-        throw_spdlog_ex("UTF-8 string is too big to be converted to UTF-16");
+        SPDLOG_THROW(spdlog_ex("UTF-8 string is too big to be converted to UTF-16"));
     }
 
     int str_size = static_cast<int>(str.size());
@@ -495,8 +496,8 @@ SPDLOG_INLINE void utf8_to_wstrbuf(string_view_t str, wmemory_buf_t &target) {
         }
     }
 
-    throw_spdlog_ex(
-        fmt_lib::format("MultiByteToWideChar failed. Last error: {}", ::GetLastError()));
+    SPDLOG_THROW(spdlog_ex(
+        fmt_lib::format("MultiByteToWideChar failed. Last error: {}", ::GetLastError())));
 }
 #endif  // (defined(SPDLOG_WCHAR_TO_UTF8_SUPPORT) || defined(SPDLOG_WCHAR_FILENAMES)) &&
         // defined(_WIN32)

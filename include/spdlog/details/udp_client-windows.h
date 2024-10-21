@@ -42,7 +42,7 @@ class udp_client {
                          last_error, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), buf,
                          (sizeof(buf) / sizeof(char)), NULL);
 
-        throw_spdlog_ex(fmt_lib::format("udp_sink - {}: {}", msg, buf));
+        SPDLOG_THROW(spdlog_ex(fmt_lib::format("udp_sink - {}: {}", msg, buf)));
     }
 
     void cleanup_() {
@@ -90,7 +90,7 @@ public:
         socklen_t tolen = sizeof(struct sockaddr);
         if (::sendto(socket_, data, static_cast<int>(n_bytes), 0, (struct sockaddr *)&addr_,
                      tolen) == -1) {
-            throw_spdlog_ex("sendto(2) failed", errno);
+            SPDLOG_THROW(spdlog_ex("sendto(2) failed", errno));
         }
     }
 };

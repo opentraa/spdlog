@@ -59,26 +59,26 @@ SPDLOG_INLINE void file_helper::open(const filename_t &fname, bool truncate) {
         details::os::sleep_for_millis(open_interval_);
     }
 
-    throw_spdlog_ex("Failed opening file " + os::filename_to_str(filename_) + " for writing",
-                    errno);
+    SPDLOG_THROW(
+        spdlog_ex("Failed opening file " + os::filename_to_str(filename_) + " for writing", errno));
 }
 
 SPDLOG_INLINE void file_helper::reopen(bool truncate) {
     if (filename_.empty()) {
-        throw_spdlog_ex("Failed re opening file - was not opened before");
+        SPDLOG_THROW(spdlog_ex("Failed re opening file - was not opened before"));
     }
     this->open(filename_, truncate);
 }
 
 SPDLOG_INLINE void file_helper::flush() {
-    if (std::fflush(fd_) != 0) {
-        throw_spdlog_ex("Failed flush to file " + os::filename_to_str(filename_), errno);
+    if (fd_ && std::fflush(fd_) != 0) {
+        SPDLOG_THROW(spdlog_ex("Failed flush to file " + os::filename_to_str(filename_), errno));
     }
 }
 
 SPDLOG_INLINE void file_helper::sync() {
-    if (!os::fsync(fd_)) {
-        throw_spdlog_ex("Failed to fsync file " + os::filename_to_str(filename_), errno);
+    if (fd_ && !os::fsync(fd_)) {
+        SPDLOG_THROW(spdlog_ex("Failed to fsync file " + os::filename_to_str(filename_), errno));
     }
 }
 
@@ -101,14 +101,15 @@ SPDLOG_INLINE void file_helper::write(const memory_buf_t &buf) {
     if (fd_ == nullptr) return;
     size_t msg_size = buf.size();
     auto data = buf.data();
-    if (std::fwrite(data, 1, msg_size, fd_) != msg_size) {
-        throw_spdlog_ex("Failed writing to file " + os::filename_to_str(filename_), errno);
+    if (fd_ && std::fwrite(data, 1, msg_size, fd_) != msg_size) {
+        SPDLOG_THROW(spdlog_ex("Failed writing to file " + os::filename_to_str(filename_), errno));
     }
 }
 
 SPDLOG_INLINE size_t file_helper::size() const {
     if (fd_ == nullptr) {
-        throw_spdlog_ex("Cannot use size() on closed file " + os::filename_to_str(filename_));
+        SPDLOG_THROW_0(
+            spdlog_ex("Cannot use size() on closed file " + os::filename_to_str(filename_)));
     }
     return os::filesize(fd_);
 }

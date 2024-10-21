@@ -33,7 +33,7 @@ public:
                const std::string &uri = "mongodb://localhost:27017") try
         : mongo_sink(std::make_shared<mongocxx::instance>(), db_name, collection_name, uri) {
     } catch (const std::exception &e) {
-        throw_spdlog_ex(fmt_lib::format("Error opening database: {}", e.what()));
+        SPDLOG_THROW(spdlog_ex(fmt_lib::format("Error opening database: {}", e.what())));
     }
 
     mongo_sink(std::shared_ptr<mongocxx::instance> instance,
@@ -46,7 +46,7 @@ public:
         try {
             client_ = spdlog::details::make_unique<mongocxx::client>(mongocxx::uri{uri});
         } catch (const std::exception &e) {
-            throw_spdlog_ex(fmt_lib::format("Error opening database: {}", e.what()));
+            SPDLOG_THROW(spdlog_ex(fmt_lib::format("Error opening database: {}", e.what())));
         }
     }
 
